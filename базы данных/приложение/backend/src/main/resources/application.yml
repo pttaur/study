@@ -1,0 +1,25 @@
+quarkus:
+  datasource:
+    storage:
+      db-kind: postgresql
+      jdbc:
+        url: ${SC_STORAGE_URL:jdbc:postgresql://localhost:5432/scagg}
+      username: ${SC_STORAGE_USER:scagg}
+      password: ${SC_STORAGE_PASSWORD:scagg}
+      devservices:
+        enabled: false
+  http:
+    root-path: /api
+    non-application-root-path: /q
+  log:
+    console:
+      json: true
+    level: INFO
+
+app:
+  encrypt:
+    # Ключ обязателен (см. docs/conventions.md): без него приложение не стартует.
+    key: ${SCHEMA_ENCRYPT_KEY}
+  connection:
+    # Необязательный allowlist хостов целевых БД (через запятую); пусто — без ограничений.
+    allowed-hosts: ${SC_CONNECTION_ALLOWED_HOSTS:}

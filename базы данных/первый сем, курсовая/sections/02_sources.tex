@@ -1,0 +1,145 @@
+\documentclass[../main.tex]{subfiles}
+\begin{document}
+
+\section{Базы-источники}
+
+Система состоит из трёх независимых баз данных. Ниже описывается
+каждая из них: назначение, состав таблиц и ключевые атрибуты.
+
+
+% =====================================================================
+\subsection{База данных: authorities\_dict (VM1, PostgreSQL)}
+
+База данных справочников. Хранит медленно меняющиеся данные:
+виды деятельности, полномочия, базовые должности, лимиты полномочий
+по должностям, шаблоны доверенностей и падежные формы. Обновляется
+редко, читается часто --- как прикладной логикой базы VM2, так и
+интерфейсом пользователя.
+
+Схема включает семь таблиц. Таблица \field{activity\_kind} хранит
+виды деятельности организации (\field{name} --- название вида).
+Таблица \field{authority} представляет иерархический справочник
+полномочий: атрибут \field{parent\_id} реализует самоссылку
+(дерево полномочий), \field{level} задаёт уровень иерархии
+(1 --- группа, 2 --- подгруппа, 3 --- полномочие),
+\field{text} содержит полный текст полномочия.
+
+Таблица \field{basic\_position} содержит базовые должности.
+Таблица \field{basic\_position\_limit} задаёт лимиты полномочий
+для базовых должностей через составной первичный ключ
+(\field{basic\_position\_id}, \field{authority\_id}).
+Таблица \field{template} хранит шаблоны доверенностей, а
+\field{template\_authority} реализует связь M:N между шаблонами
+и полномочиями. Таблица \field{padeg} хранит падежные формы
+для ФИО, названий должностей и организаций.
+
+На рисунке~\ref{fig:er-dict} показана ER-диаграмма базы данных
+\field{authorities\_dict}.
+
+\begin{figure}[H]
+  \centering
+  \resizebox{\linewidth}{!}{%
+    \input{\subfix{diagrams/firstBd}}%
+  }
+  \caption{ER-диаграмма БД №1 authorities\_dict (VM1)}
+  \label{fig:er-dict}
+\end{figure}
+
+На рисунке~\ref{fig:png-dict} приведена схема базы данных,
+построенная по таблицам и связям.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{\subfix{diagrams/vm1.png}}
+  \caption{Схема БД authorities\_dict (VM1)}
+  \label{fig:png-dict}
+\end{figure}
+
+% =====================================================================
+\subsection{База данных: authorities\_ops (VM2, PostgreSQL)}
+
+База данных операционного контура. Хранит организации, паспорта,
+должности, сотрудников, доверенности и связи доверенностей
+с полномочиями. Обновляется часто.
+
+Схема включает шесть таблиц. Таблица \field{organization} ---
+единый справочник организаций всех типов (\field{type}: ORG,
+JURIDICAL, MANAGEMENT). Таблица \field{passport} хранит паспортные
+данные. Таблица \field{position} --- должности с cross-DB ссылками
+\field{padeg\_id} и \field{basic\_position\_id} на VM1.
+Таблица \field{employee} --- сотрудники, с cross-DB ссылкой
+\field{fio\_padeg\_id} на падежные формы.
+
+Таблица \field{procuration} --- центральная таблица фактов.
+Содержит номер, даты, основание, статус, ссылки на сотрудников
+и cross-DB ссылку \field{template\_id} на шаблон из VM1.
+Таблица \field{procuration\_authority} реализует связь M:N между
+доверенностями и полномочиями с атрибутом \field{limitation\_value}.
+
+На рисунке~\ref{fig:er-ops} показана ER-диаграмма базы данных
+\field{authorities\_ops}.
+
+\begin{figure}[H]
+  \centering
+  \resizebox{\linewidth}{!}{%
+    \input{\subfix{diagrams/secondBd}}%
+  }
+  \caption{ER-диаграмма БД №2 authorities\_ops (VM2)}
+  \label{fig:er-ops}
+\end{figure}
+
+На рисунке~\ref{fig:png-ops} приведена схема базы данных,
+построенная по таблицам и связям.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{\subfix{diagrams/vm2.png}}
+  \caption{Схема БД authorities\_ops (VM2)}
+  \label{fig:png-ops}
+\end{figure}
+
+% =====================================================================
+% =====================================================================
+\subsection{База данных: authorities\_archive (VM3, MariaDB)}
+
+Архивная база данных на MariaDB. Хранит историю версий
+доверенностей, журнал аудита и снимки справочников. Данные
+загружаются в неё внешними ETL-процессами и в рамках данной
+работы рассматриваются как готовый источник.
+
+Инстанс MariaDB содержит одну базу данных \field{authorities\_archive}, в состав
+которой входят четыре таблицы. Таблица
+\field{procuration\_history} реализует SCD Type~2 для доверенностей:
+при каждом изменении создаётся новая версия с полями
+\field{valid\_from} и \field{valid\_to}. Таблица \field{audit\_log}
+хранит журнал действий пользователей над сущностями всех баз.
+Таблица \field{dict\_authority\_snapshot}~--- SCD Type~2 снимки
+справочника полномочий из VM1. Таблица \field{entity\_mapping}
+хранит соответствие идентификаторов между базами и внешними
+системами.
+
+На рисунке~\ref{fig:er-oracle} показана ER-диаграмма базы данных
+\field{authorities\_archive}.
+
+\begin{figure}[H]
+  \centering
+  \resizebox{\linewidth}{!}{%
+    \input{\subfix{diagrams/thirdBd}}%
+  }
+  \caption{ER-диаграмма БД №3 authorities\_archive (VM3, MariaDB)}
+  \label{fig:er-oracle}
+\end{figure}
+
+На рисунке~\ref{fig:png-oracle} приведена схема базы данных,
+построенная по таблицам и связям.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth]{\subfix{diagrams/vm3.png}}
+  \caption{Схема БД authorities\_archive (VM3, MariaDB)}
+  \label{fig:png-oracle}
+\end{figure}
+
+\newpage
+
+\end{document}

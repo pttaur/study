@@ -1,0 +1,106 @@
+% ==================== КОДИРОВКА И ЯЗЫК ====================
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+
+% ==================== МНОГОФАЙЛОВЫЕ ПРОЕКТЫ ====================
+\usepackage{subfiles}
+\usepackage{standalone}
+
+% ==================== ШРИФТ (Times-подобный, как в эталоне) ====================
+\usepackage{newtxtext}
+\usepackage{newtxmath}
+
+% ==================== ГЕОМЕТРИЯ ====================
+\usepackage{geometry}
+\geometry{
+  left=3cm,
+  right=1.5cm,
+  top=2cm,
+  bottom=2cm,
+  footskip=1cm
+}
+
+% ==================== ГРАФИКА И ДИАГРАММЫ ====================
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, positioning, arrows.meta, calc,
+                shadows, backgrounds, fit}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{pdflscape}
+
+% ==================== МАТЕМАТИКА ====================
+\usepackage{amsmath}
+
+% ==================== ТЕКСТ ====================
+\usepackage{setspace}
+\onehalfspacing
+\usepackage{indentfirst}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{xurl}          % переносы длинных технических имён
+
+% ==================== ТАБЛИЦЫ ====================
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{booktabs}
+
+% ==================== ГИПЕРССЫЛКИ ====================
+\usepackage[hidelinks]{hyperref}
+
+% ==================== ЗАГОЛОВКИ ====================
+% Section: 14pt жирный, слева, как в эталоне
+\titleformat{\section}
+  {\normalfont\bfseries\large}
+  {\thesection}
+  {1em}
+  {}
+\titleformat{\subsection}
+  {\normalfont\bfseries\normalsize}
+  {\thesubsection}
+  {1em}
+  {}
+
+\titlespacing*{\section}{0pt}{1.5\baselineskip}{1\baselineskip}
+\titlespacing*{\subsection}{0pt}{1.2\baselineskip}{0.8\baselineskip}
+
+% ==================== ПОДПИСИ РИСУНКОВ И ТАБЛИЦ ====================
+\captionsetup{
+  font=normalsize,
+  labelfont=normalfont,
+  labelsep=colon,             % "Рис. 1: ...", "Таблица 1: ..."
+  justification=centering,
+  singlelinecheck=false
+}
+
+% ==================== ПАРАМЕТРЫ СТРАНИЦЫ ====================
+\setlength{\parindent}{1.25cm}
+\setlength{\parskip}{0pt}
+\setlength{\emergencystretch}{3em}   % защита от переполнения строк
+\tolerance=2000
+\hyphenpenalty=1000
+\sloppy                              % глобально разрешить "прослабленные" строки
+
+% ==================== КАСТОМНЫЕ КОМАНДЫ ====================
+\newcommand{\field}[1]{\texttt{#1}}
+\urlstyle{tt}                        % \path{...} и \url{...} моноширинным
+
+% Вставка скриншота: если файла ещё нет, выводится рамка-заглушка.
+% \screenshot{путь}{подпись}{метка}{текст-подсказка}
+\newcommand{\screenshot}[4]{%
+  \begin{figure}[H]
+    \centering
+    \IfFileExists{#1}{%
+      \includegraphics[width=\linewidth]{#1}%
+    }{%
+      \fbox{\begin{minipage}[c][6cm][c]{0.92\linewidth}
+        \centering\small
+        \textbf{Место для скриншота}\\[4pt]
+        #4
+      \end{minipage}}%
+    }%
+    \caption{#2}
+    \label{#3}
+  \end{figure}
+}

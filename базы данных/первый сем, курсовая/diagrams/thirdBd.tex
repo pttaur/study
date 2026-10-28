@@ -1,0 +1,50 @@
+\begin{tikzpicture}[
+  x=1cm, y=1cm,
+  entity/.style = {
+    draw, rounded corners=6pt, thick,
+    minimum width=3.2cm, minimum height=1.1cm,
+    font=\small\bfseries, align=center, inner sep=4pt,
+    fill=orange!25
+  },
+  entity_ghost/.style = {
+    draw, rounded corners=6pt, thick, dashed, draw=red!60,
+    fill=red!12, text=red!80!black,
+    minimum width=3.2cm, minimum height=1.1cm,
+    font=\small\bfseries, align=center, inner sep=4pt
+  },
+  relation/.style = {
+    draw, diamond, aspect=2.2, thick,
+    minimum width=2.6cm, minimum height=1.1cm,
+    font=\footnotesize, align=center, inner sep=1pt,
+    fill=green!25
+  },
+  relation_ghost/.style = {
+    draw, diamond, aspect=2.2, thick, dashed, draw=red!60,
+    fill=red!12, text=red!80!black,
+    minimum width=2.6cm, minimum height=1.1cm,
+    font=\footnotesize, align=center, inner sep=1pt
+  },
+  card/.style = {
+    font=\bfseries\small,
+    fill=white, inner sep=2pt,
+    pos=0.5
+  },
+  part/.style  = {thick},
+  total/.style = {thick, double, double distance=2.5pt},
+  cross/.style = {thick, dashed, color=red!60}
+]
+
+% ==================== ВЕРХНИЙ РЯД ====================
+\node[entity] (PH) at (0, 0) {Архив версий\\доверенностей};
+\node[entity] (EM) at (9, 0) {Соответствие\\идентификаторов};
+
+% ==================== СВЯЗЬ ====================
+\node[relation] (r) at (4.5, -2.5) {описывает};
+\draw[part] (PH.south) -- node[card]  {$N$} (r.north west);
+\draw[part] (r.north east) -- node[card] {$1$} (EM.south);
+
+% ==================== НИЖНИЙ РЯД: самостоятельные сущности ====================
+\node[entity] (AL)  at (0, -6) {Журнал\\аудита};
+\node[entity] (DAS) at (9, -6) {Снимки\\справочника};
+
+\end{tikzpicture}

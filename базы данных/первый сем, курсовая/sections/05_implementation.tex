@@ -1,0 +1,125 @@
+\documentclass[../main.tex]{subfiles}
+\begin{document}
+
+\section{Реализация системы}
+
+\subsection{Структура проекта}
+
+Исходный код сервера организован по слоям, приведённым
+в таблице~\ref{tab:backend-layers}.
+
+\begin{table}[H]
+  \centering
+  \small
+  \begin{tabular}{@{}>{\raggedright\arraybackslash}p{2.4cm}>{\raggedright\arraybackslash}p{6.7cm}>{\raggedright\arraybackslash}p{5.0cm}@{}}
+    \toprule
+    Слой & Классы & Ответственность \\
+    \midrule
+    \field{controller} & \field{DbController}, \field{RowsController},
+      \field{JoinController} & REST API \\
+    \field{service} & \field{SchemaLoader}, \field{DiffService},
+      \field{RowsService}, \field{FederationService} и др. & Сбор схемы,
+      сравнение, выборка строк, федеративные запросы \\
+    \field{repository} & \field{InstanceRepository},
+      \field{CatalogRepository}, \field{QueryHistoryRepository} &
+      Доступ к таблицам \field{sc\_*} \\
+    \field{model} & \field{Catalog}, \field{Schema}, \field{Table},
+      \field{Column}, \field{Constraint}, \field{Index} & Объектная
+      модель схемы и результатов \\
+    \field{util} & \field{SqlQueries}, \field{CryptoUtil},
+      \field{RowsUtil} & SQL-константы, шифрование \\
+    \bottomrule
+  \end{tabular}
+  \caption{Слои серверной части}
+  \label{tab:backend-layers}
+\end{table}
+
+Клиентская часть построена из компонентов: \field{InstanceDock}
+с формой подключения и деревом схем, \field{SchemaTree},
+\field{RowsExplorer} и \field{RowDiffView} для работы с данными,
+\field{SchemaDiffDrawer} и \field{DiffViewer} для сравнения схем,
+\field{JoinBuilder} и \field{QueryResultView} для федеративных
+запросов. Состояние вынесено в runes-модули
+\field{instances.svelte.ts} и \field{join.svelte.ts}; модуль
+\field{api.ts} инкапсулирует обращения к REST.
+
+\subsection{Сбор и сохранение метаданных}
+
+Загрузка схемы начинается POST-запросом к ресурсу инстанса
+(\field{/load}). Обработчик проверяет существование инстанса,
+расшифровывает пароль и выбирает коннектор
+по типу СУБД. Коннектор \field{PostgresConnector} читает
+\field{information\_schema} и \field{pg\_catalog}, а
+\field{MariaDbConnector}~--- \field{information\_schema} MariaDB.
+Оба коннектора работают через соединение <<только чтение>>, поэтому
+сбор метаданных не блокирует таблицы источника и не требует его
+остановки.
+
+Собранный каталог сохраняется в рамках транзакции в два этапа.
+Сначала записываются схемы, таблицы, колонки и индексы. Затем
+сохраняются ограничения: для внешнего ключа выполняется поиск
+целевой таблицы в уже сохранённом каталоге и заполняется
+\field{ref\_table\_id}. Если целевая таблица не найдена, внешний
+ключ пропускается с записью в журнал, чтобы не нарушать целостность
+каталога. После успешного сохранения каталог становится доступен
+для последующих запросов.
+
+\subsection{REST API}
+
+Все эндпоинты расположены под префиксом \path{/api}. Основные
+операции приведены в таблице~\ref{tab:api}. Запросы возвращают
+полный JSON-ответ и завершаются сразу после отправки данных.
+
+{\footnotesize
+\begin{longtable}{@{}p{1.25cm}p{6.0cm}p{7.5cm}@{}}
+  \caption{Основные эндпоинты REST API}
+  \label{tab:api}\\
+  \toprule
+  Метод & Путь & Назначение \\
+  \midrule
+  \endfirsthead
+  \toprule
+  Метод & Путь & Назначение \\
+  \midrule
+  \endhead
+  \bottomrule
+  \endfoot
+  GET & \path{/api/instances} & Список подключённых источников \\
+  GET & \path{/api/instances/{id}} & Источник по идентификатору \\
+  POST & \path{/api/instances} & Создание источника \\
+  PATCH & \path{/api/instances/{id}/password} & Смена пароля \\
+  PATCH & \path{/api/instances/{id}/alias} & Смена alias для федерации \\
+  POST & \path{/api/instances/aliases/backfill} & Проставить alias
+    существующим источникам \\
+  POST & \path{/api/instances/{id}/load} & Собрать и сохранить схему \\
+  POST & \path{/api/instances/{id}/check} & Сравнить сохранённую схему
+    с текущей \\
+  GET & \path{/api/instances/{id}/schema} & Каталог источника \\
+  POST & \path{/api/instances/compare} & Сравнить две схемы \\
+  GET & \path{/api/instances/{id}/tables/{schema}/{table}/rows} &
+    Страница строк таблицы \\
+  POST & \path{/api/join} & Выполнить федеративный запрос \\
+  GET & \path{/api/join/history} & История федеративных запросов \\
+\end{longtable}
+}
+
+\subsection{Федеративные запросы}
+
+Федеративный запрос формируется клиентом в виде структуры
+\field{\{tables, select, maxRows, offset, timeoutMs\}} и отправляется
+в \path{POST /api/join}. Сервер компилирует структуру в SQL, разбирает
+его через JSqlParser, определяет источники и нужные колонки, а затем
+выполняет чтение подтаблиц по JDBC. Прочитанные строки загружаются
+во временные таблицы хранилища PostgreSQL, где и выполняется
+соединение. Такой подход позволяет соединять данные разных СУБД
+без переноса всех данных в одно постоянное хранилище:
+материализуются только строки и колонки, необходимые для конкретного
+запроса.
+
+Для ограничения нагрузки на источники и хранилище установлены
+лимиты: до 1000 строк в ответе по умолчанию и до 100~000
+максимально, время выполнения до 30~с по умолчанию и до 300~с
+максимально, до 500~000 строк из одного источника. Результат
+истории сохраняется в таблице \field{sc\_query\_history}.
+
+\end{document}

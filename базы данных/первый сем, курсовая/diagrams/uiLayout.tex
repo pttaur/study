@@ -1,0 +1,125 @@
+\begin{tikzpicture}[
+  x=1cm, y=1cm, font=\scriptsize,
+  field/.style = {
+    draw, rounded corners=1.5pt, fill=white, draw=black!25
+  },
+  chip/.style = {
+    draw, rounded corners=2pt, fill=black!7, draw=black!20,
+    font=\tiny, inner sep=1pt
+  },
+  tab/.style = {
+    draw, rounded corners=2pt, font=\scriptsize, inner sep=2pt
+  }
+]
+
+% ==================== ОКНО ====================
+\draw[thick, rounded corners=3pt, fill=white] (0,0) rectangle (16,9.6);
+
+% верхняя строка
+\fill[black!82, rounded corners=2pt] (0.03,9.02) rectangle (15.97,9.57);
+\node[white, anchor=west, font=\bfseries\scriptsize]
+  at (0.22,9.30) {Schema Catalog Aggregator};
+
+% ==================== ЛЕВАЯ ПАНЕЛЬ ====================
+\fill[black!4] (0.03,0.03) rectangle (4.30,9.02);
+\draw[black!18] (4.30,0.03) -- (4.30,9.02);
+
+\node[anchor=north west, font=\bfseries\scriptsize] at (0.18,8.90)
+  {Новый инстанс};
+
+\foreach \y/\lbl in {8.45/Название, 8.05/JDBC URL, 7.65/Пользователь,
+                   7.25/Пароль, 6.85/Alias} {
+  \draw[field] (0.18,\y-0.27) rectangle (2.05,\y);
+  \node[anchor=west, black!50] at (0.24,\y-0.135) {\lbl};
+}
+\draw[field] (2.15,6.58) rectangle (4.12,6.85);
+\node[anchor=west, black!50] at (2.21,6.715) {PostgreSQL};
+\draw[fill=blue!18, rounded corners=2pt, draw=blue!35]
+  (0.18,6.05) rectangle (4.12,6.40);
+\node at (2.15,6.225) {Создать};
+
+\node[anchor=north west, font=\bfseries\scriptsize] at (0.18,5.82)
+  {Источники};
+
+\foreach \y/\iname/\ialias in {5.30/vault1/@dict, 4.55/vault2/@ops,
+                      3.80/demo-local/@demo} {
+  \draw[field] (0.18,\y-0.34) rectangle (4.12,\y);
+  \node[anchor=west] at (0.26,\y-0.17) {\iname};
+  \node[anchor=east, black!50] at (3.05,\y-0.17) {\ialias};
+  \node[chip] at (3.82,\y-0.17) {обн};
+}
+
+% дерево выбранного источника
+\node[anchor=west, font=\bfseries\tiny, black!65] at (0.25,3.35)
+  {Схема vault1};
+\node[anchor=west] at (0.35,3.05) {\textbf{--} public};
+\node[anchor=west, black!70] at (0.55,2.75) {employee};
+\node[anchor=west, black!70] at (0.55,2.45) {procuration};
+\node[anchor=west, black!70] at (0.55,2.15) {organization};
+\node[anchor=west, font=\tiny, black!50] at (0.75,1.85)
+  {колонки · PK · FK · индексы};
+
+% ==================== РАБОЧАЯ ОБЛАСТЬ ====================
+\node[tab, fill=blue!18, draw=blue!35] at (5.15,8.72) {Данные};
+\node[tab, fill=white, draw=black!25] at (6.35,8.72) {Джойн};
+
+\node[anchor=west, black!65] at (4.55,8.28)
+  {Таблица public.employee};
+\node[anchor=east, black!45] at (15.75,8.28)
+  {17 колонок · PK id};
+
+% шапка и сетка таблицы
+\fill[black!6] (4.55,7.82) rectangle (15.75,8.14);
+\node[anchor=west, font=\tiny] at (4.65,7.98) {id};
+\node[anchor=west, font=\tiny] at (5.65,7.98) {last\_name};
+\node[anchor=west, font=\tiny] at (7.35,7.98) {first\_name};
+\node[anchor=west, font=\tiny] at (9.35,7.98) {position};
+\node[anchor=west, font=\tiny] at (11.55,7.98) {organization};
+\node[anchor=west, font=\tiny] at (13.75,7.98) {status};
+
+\foreach \x in {5.55,7.25,9.25,11.45,13.65} {
+  \draw[black!12] (\x,5.10) -- (\x,7.82);
+}
+\foreach \y in {7.52,7.22,6.92,6.62,6.32,6.02,5.72,5.42,5.12} {
+  \draw[black!12] (4.55,\y) -- (15.75,\y);
+}
+\foreach \y/\rowid/\surn/\fname/\job in {
+  7.67/1/Смирнов/Александр/Ген. директор,
+  7.37/2/Иванов/Пётр/Зам. директора,
+  7.07/3/Петрова/Анна/Гл. бухгалтер,
+  6.77/4/Сидоров/Иван/Юрист,
+  6.47/5/Кузнецова/Мария/Менеджер,
+  6.17/6/Орлов/Дмитрий/Инженер} {
+  \node[font=\tiny, anchor=west] at (4.65,\y) {\rowid};
+  \node[font=\tiny, anchor=west] at (5.65,\y) {\surn};
+  \node[font=\tiny, anchor=west] at (7.35,\y) {\fname};
+  \node[font=\tiny, anchor=west] at (9.35,\y) {\job};
+}
+
+% ==================== ПАНЕЛЬ СРАВНЕНИЯ ====================
+\draw[rounded corners=2pt, fill=white, draw=black!25]
+  (4.55,0.20) rectangle (15.75,4.15);
+\fill[black!7, rounded corners=2pt] (4.55,3.82) rectangle (15.75,4.15);
+\node[anchor=west, font=\bfseries\tiny] at (4.68,3.985)
+  {Схема-дифф: vault1};
+\node[anchor=east, font=\tiny, black!55] at (15.62,3.985)
+  {\textbf{--} свернуть};
+
+\node[font=\tiny, black!55] at (6.55,3.58) {Эталон (сохранено)};
+\node[font=\tiny, black!55] at (11.55,3.58) {Текущая БД (live)};
+
+\foreach \y/\lefttext/\righttext in {
+  3.28/col\_name/col\_name,
+  2.98/type/text,
+  2.68/is\_nullable/NOT NULL,
+  2.38/--/created\_at} {
+  \draw[black!10] (4.70,\y-0.12) rectangle (8.40,\y+0.12);
+  \draw[black!10] (9.70,\y-0.12) rectangle (13.40,\y+0.12);
+  \node[font=\tiny, anchor=west] at (4.78,\y) {\lefttext};
+  \node[font=\tiny, anchor=west] at (9.78,\y) {\righttext};
+}
+\draw[green!55!black, thick] (8.55,3.28) -- (9.55,3.28);
+\draw[red!70, thick] (8.55,2.38) -- (9.55,2.38);
+
+% ==================== ПОДПИСИ ====================
+\end{tikzpicture}

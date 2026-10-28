@@ -1,0 +1,83 @@
+\documentclass[tikz,border=15pt]{standalone}
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usetikzlibrary{positioning, arrows.meta, calc, fit, backgrounds}
+
+\begin{document}
+
+\begin{tikzpicture}[
+  x=1cm, y=1cm,
+  opstable/.style = {
+    draw, rounded corners=4pt, thick,
+    minimum width=4.2cm, minimum height=0.9cm,
+    font=\small\bfseries, align=center,
+    fill=orange!25
+  },
+  dicttable/.style = {
+    draw, rounded corners=4pt, thick,
+    minimum width=4.2cm, minimum height=0.9cm,
+    font=\small\bfseries, align=center,
+    fill=blue!20
+  },
+  fklabel/.style = {
+    font=\footnotesize\itshape, fill=white, inner sep=1.5pt,
+    pos=0.5
+  },
+  crossarrow/.style = {
+    thick, dashed, color=red!60,
+    -{Stealth[length=2.5mm]}
+  },
+  crossarrowtotal/.style = {
+    thick, dashed, double, double distance=2pt, color=red!60,
+    -{Stealth[length=2.5mm]}
+  }
+]
+
+% ==================== ЛЕВАЯ БД (authorities_ops) ====================
+\node[opstable] (EMP)  at (0,  0)    {employee};
+\node[opstable] (POS)  at (0, -2.5)  {position};
+\node[opstable] (PROC) at (0, -5)    {procuration};
+\node[opstable] (PA)   at (0, -7.5)  {procuration\_authority};
+
+% ==================== ПРАВАЯ БД (authorities_dict) ====================
+\node[dicttable] (PADEG) at (10, 0)    {padeg};
+\node[dicttable] (BPOS)  at (10, -2.5) {basic\_position};
+\node[dicttable] (TPL)   at (10, -5)   {template};
+\node[dicttable] (AUTH)  at (10, -7.5) {authority};
+
+% ==================== СТРЕЛКИ (cross-DB) ====================
+
+% employee → padeg (fio_padeg_id, nullable)
+\draw[crossarrow] (EMP.east) -- 
+  node[fklabel, above] {fio\_padeg\_id} (PADEG.west);
+
+% position → padeg (padeg_id, NOT NULL) — total
+\draw[crossarrowtotal] (POS.east) -- 
+  node[fklabel, above, pos=0.4] {padeg\_id (NOT NULL)} (PADEG.west);
+
+% position → basic_position (basic_position_id, nullable)
+\draw[crossarrow] (POS.east) -- 
+  node[fklabel, below, pos=0.6] {basic\_position\_id} (BPOS.west);
+
+% procuration → template (template_id, NOT NULL) — total
+\draw[crossarrowtotal] (PROC.east) -- 
+  node[fklabel, above] {template\_id (NOT NULL)} (TPL.west);
+
+% procuration_authority → authority (authority_id, NOT NULL, M:N bridging)
+\draw[crossarrow] (PA.east) -- 
+  node[fklabel, above] {authority\_id (M:N)} (AUTH.west);
+
+% ==================== ГРАНИЦЫ БД ====================
+\begin{scope}[on background layer]
+  \node[fit=(EMP)(PA), draw, dashed, thick, color=orange!70,
+        inner sep=12pt, rounded corners=8pt,
+        label={[font=\bfseries\small, color=orange!70!black]above:БД №2: authorities\_ops (VM2)}] {};
+  \node[fit=(PADEG)(AUTH), draw, dashed, thick, color=blue!70,
+        inner sep=12pt, rounded corners=8pt,
+        label={[font=\bfseries\small, color=blue!70!black]above:БД №1: authorities\_dict (VM1)}] {};
+\end{scope}
+
+\end{tikzpicture}
+
+\end{document}

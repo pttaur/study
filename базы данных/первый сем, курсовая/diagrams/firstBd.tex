@@ -1,0 +1,64 @@
+\begin{tikzpicture}[
+  x=1cm, y=1cm,
+  entity/.style = {
+    draw, rounded corners=6pt, thick,
+    minimum width=3.2cm, minimum height=1.1cm,
+    font=\small\bfseries, align=center, inner sep=4pt,
+    fill=blue!20
+  },
+  relation/.style = {
+    draw, diamond, aspect=2.2, thick,
+    minimum width=2.6cm, minimum height=1.1cm,
+    font=\footnotesize, align=center, inner sep=1pt,
+    fill=green!25
+  },
+  card/.style = {
+    font=\bfseries\small,
+    fill=white, inner sep=2pt,
+    pos=0.5
+  },
+  part/.style  = {thick},
+  total/.style = {thick, double, double distance=2.5pt}
+]
+
+% ==================== СУЩНОСТИ ====================
+\node[entity] (VK) at (0,   0) {Вид деятельности};
+\node[entity] (T)  at (6,   0) {Шаблон};
+\node[entity] (BL) at (13,  0) {Базовый\\лимит};
+
+\node[entity] (P)  at (4,  -9) {Полномочие};
+\node[entity] (BP) at (13, -9) {Базовая\\должность};
+
+% ==================== РОМБЫ ====================
+\node[relation] (r_kind) at (-1.5, -4.5) {относится к};
+\node[relation] (r_tplK) at ( 2.8, -2.0) {привязан к};
+\node[relation] (r_tplA) at ( 5.8, -4.5) {включает};
+\node[relation] (r_lim)  at ( 8.8, -4.5) {ограничивает};
+\node[relation] (r_bp)   at (13.0, -4.5) {задаётся для};
+\node[relation] (r_self) at ( 9.5, -9.0) {включает\\(self)};
+
+% ==================== РЁБРА ====================
+\draw[part] (VK)     -- node[card] {$N$} (r_kind);
+\draw[part] (r_kind) -- node[card] {$1$} (P);
+
+\draw[part] (T)      -- node[card] {$N$} (r_tplK);
+\draw[part] (r_tplK) -- node[card] {$1$} (VK);
+
+\draw[part] (T)      -- node[card] {$M$} (r_tplA);
+\draw[part] (r_tplA) -- node[card] {$N$} (P);
+
+\draw[total] (BL)    -- node[card] {$N$} (r_lim);
+\draw[part]  (r_lim) -- node[card] {$1$} (P);
+
+\draw[total] (BL)    -- node[card] {$N$} (r_bp);
+\draw[part]  (r_bp)  -- node[card] {$1$} (BP);
+
+\draw[part] (P.north east)
+  .. controls +(1.2, 0.9) and +(-1.6, 0.9) ..
+  node[card, pos=0.25] {$1$} (r_self.north west);
+
+\draw[part] (r_self.south west)
+  .. controls +(-1.6, -0.9) and +(1.2, -0.9) ..
+  node[card, pos=0.25] {$N$} (P.south east);
+
+\end{tikzpicture}

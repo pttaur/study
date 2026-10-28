@@ -1,0 +1,71 @@
+\begin{tikzpicture}[
+  x=1cm, y=1cm, font=\small,
+  db/.pic={
+    \draw[fill=#1!25, draw=#1!80, thick]
+      (-0.3,0) -- (-0.3,-0.4) arc (180:360:0.3 and 0.1) -- (0.3,0);
+    \draw[fill=#1!40, draw=#1!80, thick]
+      (0,0) ellipse (0.3 and 0.1);
+  },
+  vmbox/.style={draw, thick, minimum width=2.6cm, minimum height=1.8cm},
+  vmlbl/.style={font=\footnotesize\bfseries, anchor=north west, inner sep=2pt},
+  dblbl/.style={font=\scriptsize, align=center},
+  box/.style={draw, thick, minimum width=3cm, minimum height=1cm},
+  title/.style={font=\bfseries\footnotesize},
+  arrow/.style={-{Stealth[length=2.5mm, width=1.6mm]}, thick}
+]
+
+% ==================== REPOSITORY ====================
+\node[vmbox] (vm1) at (2, 10) {};
+\node[vmlbl, text=blue!70!black] at (vm1.north west) {VM1};
+\path (2, 10.4) pic {db=blue};
+\node[dblbl, text=blue!70!black] at (2, 9.55)
+  {authorities\_dict\\ PostgreSQL 16};
+
+\node[vmbox] (vm2) at (5.4, 10) {};
+\node[vmlbl, text=orange!70!black] at (vm2.north west) {VM2};
+\path (5.4, 10.4) pic {db=orange};
+\node[dblbl, text=orange!70!black] at (5.4, 9.55)
+  {authorities\_ops\\ PostgreSQL 16};
+
+\node[vmbox] (vm3) at (8.8, 10) {};
+\node[vmlbl, text=red!70!black] at (vm3.north west) {VM3};
+\path (8.8, 10.4) pic {db=red};
+\node[dblbl, text=red!70!black] at (8.8, 9.55)
+  {authorities\_archive\\ MariaDB 11};
+
+\begin{scope}[on background layer]
+  \node[draw, thick, dashed, inner sep=8pt,
+        fit=(vm1) (vm2) (vm3)] (repo) {};
+\end{scope}
+\node[font=\bfseries\footnotesize, anchor=south west, inner sep=4pt]
+  at ([yshift=2pt]repo.north west) {REPOSITORY};
+
+% ==================== SERVICE ====================
+\node[box] (service) at (2.2, 5.5) {};
+\node[title] at (service.center) {SERVICE};
+
+% ==================== AGGREGATOR_DB ====================
+% блок шире, текст сверху, иконка снизу по центру
+\node[box, minimum width=5cm, minimum height=1.8cm] (agg) at (9, 5.5) {};
+\node[title, anchor=center] at ([yshift=3pt]agg.center) {AGGREGATOR\_DB};
+\path ([yshift=-5pt]agg.center) pic {db=black};
+
+% ==================== CLIENT ====================
+\node[box] (client) at (2.2, 1.5) {};
+\node[title] at (client.center) {CLIENT};
+
+% ==================== СВЯЗИ ====================
+\draw[arrow] (repo.south) -- (service.north)
+  node[midway, above, sloped, font=\footnotesize] {SELECT};
+
+\draw[arrow] ([yshift=2pt]service.east) -- ([yshift=2pt]agg.west)
+  node[midway, above, font=\footnotesize] {INSERT};
+
+\draw[arrow] ([yshift=-2pt]agg.west) -- ([yshift=-2pt]service.east)
+  node[midway, below, font=\footnotesize] {SELECT};
+
+\draw[arrow] (service.south) -- (client.north)
+  node[midway, right, xshift=2pt, font=\footnotesize, align=left]
+  {HTTP:\\schema, diff};
+
+\end{tikzpicture}

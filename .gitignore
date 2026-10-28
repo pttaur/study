@@ -1,0 +1,39 @@
+# LaTeX
+.latex-aux/
+*.aux
+*.log
+*.out
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+
+# Node / Java
+node_modules/
+target/
+dist/
+build/
+*.class
+*.jar
+*.war
+
+# IDE / OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.ipynb_checkpoints/
+
+# Environment / Secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log

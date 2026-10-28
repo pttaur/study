@@ -1,0 +1,142 @@
+:root {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  --bg: #0d1117;
+  --panel: #161b22;
+  --border: #30363d;
+  --text: #e6edf3;
+  --muted: #8b949e;
+  --accent: #58a6ff;
+  --added: #3fb950;
+  --removed: #f85149;
+  --modified: #d29922;
+  --inset: #010409;
+  --btn: #21262d;
+  --btn-hover: #30363d;
+  --accent-emphasis: #1f6feb;
+  --added-fg: #7ee787;
+  --removed-fg: #ffa198;
+  --modified-fg: #e3b341;
+  --added-bg: rgba(46, 160, 67, 0.15);
+  --removed-bg: rgba(248, 81, 73, 0.15);
+  --modified-bg: rgba(187, 128, 9, 0.15);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--btn);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 6px 12px;
+}
+
+button:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: var(--btn-hover);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 6px 8px;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 12px;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.error {
+  color: var(--removed);
+}
+
+.lg {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.tag {
+  display: inline-block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: 4px;
+  padding: 1px 6px;
+  margin-left: 6px;
+}
+
+.tag.added,
+.tag.removed,
+.tag.modified {
+  color: #0d1117;
+  font-weight: 700;
+}
+
+.tag.added {
+  background: var(--added);
+}
+
+.tag.removed {
+  background: var(--removed);
+}
+
+.tag.modified {
+  background: var(--modified);
+}

@@ -1,0 +1,37 @@
+\begin{tikzpicture}[
+  x=1cm, y=1cm,
+  src/.style = {
+    draw, rounded corners=6pt, fill=orange!20, thick, dashed, draw=orange!70,
+    text=orange!80!black,
+    minimum width=3.6cm, minimum height=1.0cm,
+    font=\small\bfseries, align=center
+  },
+  dst/.style = {
+    draw, rounded corners=6pt, fill=green!20, thick,
+    minimum width=3.6cm, minimum height=1.0cm,
+    font=\small\bfseries, align=center
+  },
+  etl/.style = {
+    very thick, ->, >=Stealth, color=red!60
+  }
+]
+
+% ==================== ПРИЁМНИКИ (Oracle) — верх ====================
+\node[dst] (PH)  at ( 0, 0) {Архив версий\\доверенностей};
+\node[dst] (AL)  at ( 6, 0) {Журнал\\аудита};
+\node[dst] (DAS) at (12, 0) {Снимки\\справочника};
+\node[dst] (EM)  at (18, 0) {Соответствие\\идентификаторов};
+
+% ==================== ИСТОЧНИКИ (PG) — низ ====================
+\node[src] (PROC) at ( 0, -4) {Доверенность\\(VM2)};
+\node[src] (EMP)  at ( 6, -4) {Сотрудник\\(VM2)};
+\node[src] (AUTH) at (12, -4) {Полномочие\\(VM1)};
+\node[src] (ORG)  at (18, -4) {Организация\\(VM2)};
+
+% ==================== СТРЕЛКИ ====================
+\draw[etl] (PROC.north) -- (PH.south);
+\draw[etl] (EMP.north)  -- (AL.south);
+\draw[etl] (AUTH.north) -- (DAS.south);
+\draw[etl] (ORG.north)  -- (EM.south);
+
+\end{tikzpicture}

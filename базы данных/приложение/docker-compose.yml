@@ -1,0 +1,62 @@
+# ============================================================================
+# Schema Catalog Aggregator — стек: db (PostgreSQL) + backend (Quarkus) + frontend (nginx)
+#
+# Секреты и параметры берутся из .env (см. .env.example). SCHEMA_ENCRYPT_KEY
+# обязателен — без него backend не стартует.
+# ============================================================================
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-scagg}
+      POSTGRES_USER: ${POSTGRES_USER:-scagg}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-scagg}
+    volumes:
+      - scagg-data:/var/lib/postgresql/data
+      - ./sql/V1__create_schema.sql:/docker-entrypoint-initdb.d/01-V1.sql:ro
+      - ./sql/V2__encrypt_password.sql:/docker-entrypoint-initdb.d/02-V2.sql:ro
+      - ./sql/V3__snapshot_rows.sql:/docker-entrypoint-initdb.d/03-V3.sql:ro
+      - ./sql/V4__federation.sql:/docker-entrypoint-initdb.d/04-V4.sql:ro
+      - ./sql/V5__constraints_and_triggers.sql:/docker-entrypoint-initdb.d/05-V5.sql:ro
+      - ./sql/V6__normalize_catalog.sql:/docker-entrypoint-initdb.d/06-V6.sql:ro
+      - ./sql/V7__drop_sc_rows.sql:/docker-entrypoint-initdb.d/07-V7.sql:ro
+      - ./sql/V8__remove_instance_alias.sql:/docker-entrypoint-initdb.d/08-V8.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-scagg} -d ${POSTGRES_DB:-scagg}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    environment:
+      SC_STORAGE_URL: ${SC_STORAGE_URL:-jdbc:postgresql://db:5432/scagg}
+      SC_STORAGE_USER: ${SC_STORAGE_USER:-scagg}
+      SC_STORAGE_PASSWORD: ${SC_STORAGE_PASSWORD:-scagg}
+      SCHEMA_ENCRYPT_KEY: ${SCHEMA_ENCRYPT_KEY:?Set SCHEMA_ENCRYPT_KEY in .env (see .env.example)}
+      SC_CONNECTION_ALLOWED_HOSTS: ${SC_CONNECTION_ALLOWED_HOSTS:-}
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/q/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+
+volumes:
+  scagg-data:

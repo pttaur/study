@@ -87,20 +87,20 @@
 \urlstyle{tt}                        % \path{...} и \url{...} моноширинным
 
 % Вставка скриншота: если файла ещё нет, выводится рамка-заглушка.
-% \screenshot{путь}{подпись}{метка}{текст-подсказка}
-\newcommand{\screenshot}[4]{%
+% \screenshot[ширина]{путь}{подпись}{метка}{текст-подсказка}
+\newcommand{\screenshot}[5][\linewidth]{%
   \begin{figure}[H]
     \centering
-    \IfFileExists{#1}{%
-      \includegraphics[width=\linewidth]{#1}%
+    \IfFileExists{#2}{%
+      \includegraphics[width=#1]{#2}%
     }{%
       \fbox{\begin{minipage}[c][6cm][c]{0.92\linewidth}
         \centering\small
         \textbf{Место для скриншота}\\[4pt]
-        #4
+        #5
       \end{minipage}}%
     }%
-    \caption{#2}
-    \label{#3}
+    \caption{#3}
+    \label{#4}
   \end{figure}
 }

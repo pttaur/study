@@ -8,19 +8,15 @@
   },
   src/.style={
     draw, rounded corners=2pt, thick, fill=black!5,
-    minimum width=3.0cm, minimum height=1.0cm, align=center
+    minimum width=3.8cm, minimum height=1.1cm, align=center
   },
   func/.style={
     draw, rounded corners=2pt, thick, fill=blue!7, draw=blue!50,
-    minimum width=2.9cm, minimum height=1.3cm, align=center
-  },
-  apibar/.style={
-    draw, rounded corners=2pt, thick, fill=blue!16, draw=blue!60,
-    minimum width=9.3cm, minimum height=0.75cm, align=center
+    minimum width=4.8cm, minimum height=1.2cm, align=center
   },
   clientbox/.style={
     draw, rounded corners=2pt, fill=purple!8, draw=purple!50,
-    minimum width=2.9cm, minimum height=0.8cm, align=center
+    minimum width=4.0cm, minimum height=0.9cm, align=center
   },
   arrow/.style={-{Stealth[length=2.5mm, width=1.6mm]}, thick},
   biarrow/.style={
@@ -31,59 +27,56 @@
 ]
 
 % ==================== ИСТОЧНИКИ ====================
-\node[src] (vm1) at (3.0, 10.4) {VM1\\ authorities\_dict};
-\node[src] (vm2) at (6.5, 10.4) {VM2\\ authorities\_ops};
-\node[src] (vm3) at (10.0, 10.4) {VM3\\ authorities\_archive};
-\node[font=\bfseries\footnotesize] at (6.5, 11.2) {ИСТОЧНИКИ};
+\node[src] (vm1) at (3.2, 10.5) {VM1\\ authorities\_dict};
+\node[src] (vm2) at (8.5, 10.5) {VM2\\ authorities\_ops};
+\node[src] (vm3) at (13.8, 10.5) {VM3\\ authorities\_archive};
+\node[font=\bfseries\footnotesize] at (8.5, 11.4) {ИСТОЧНИКИ};
 
-\draw[arrow] (vm1.south) -- (3.0, 9.65);
-\draw[arrow] (vm2.south) -- (6.5, 9.65);
-\draw[arrow] (vm3.south) -- (10.0, 9.65);
-\draw[thick] (3.0, 9.65) -- (10.0, 9.65);
-\draw[arrow] (6.5, 9.65) -- (6.5, 9.2)
-  node[midway, right, lbl] {JDBC};
+\draw[arrow] (vm1.south) -- (3.2, 9.7);
+\draw[arrow] (vm2.south) -- (8.5, 9.7);
+\draw[arrow] (vm3.south) -- (13.8, 9.7);
+\draw[thick] (3.2, 9.7) -- (13.8, 9.7);
+\draw[arrow] (8.5, 9.7) -- (8.5, 9.0);
+\node[lbl] at (6.2, 9.7) {JDBC};
 
 % ==================== СЕРВИС ====================
 \draw[rounded corners=4pt, thick, fill=blue!2, draw=blue!45]
-  (0.5, 4.8) rectangle (10.5, 9.2);
+  (0.5, 3.8) rectangle (12.0, 9.0);
 \node[anchor=north west, font=\bfseries\footnotesize]
-  at (0.7, 9.05) {SERVICE (Quarkus)};
+  at (0.7, 8.85) {SERVICE (Quarkus)};
 
-\node[apibar] (api) at (5.5, 8.4) {REST API};
-\node[func] (collect) at (2.3, 6.6)
+\node[func] (collect) at (3.3, 7.3)
   {Сбор\\ метаданных};
-\node[func] (compare) at (5.5, 6.6)
+\node[func] (compare) at (8.7, 7.3)
   {Сравнение\\ метаданных};
-\node[func] (federation) at (8.7, 6.6)
+\node[func] (federation) at (3.3, 5.1)
   {Федеративные\\ запросы};
-
-\draw[arrow] (2.3, 8.02) -- (2.3, 7.25);
-\draw[arrow] (5.5, 8.02) -- (5.5, 7.25);
-\draw[arrow] (8.7, 8.02) -- (8.7, 7.25);
+\node[func] (api) at (8.7, 5.1)
+  {Веб-интерфейс\\ и REST API};
 
 % ==================== ХРАНИЛИЩЕ ====================
 \draw[rounded corners=4pt, thick, fill=green!4, draw=green!55]
-  (12.0, 4.8) rectangle (15.5, 9.2);
+  (13.5, 3.8) rectangle (17.0, 9.0);
 \node[anchor=north west, font=\bfseries\footnotesize, text=green!40!black]
-  at (12.2, 9.05) {AGGREGATOR\_DB};
-\path (13.75, 8.55) pic {db=green};
-\node[font=\scriptsize, align=center, text=green!35!black]
-  at (13.75, 7.65)
+  at (13.7, 8.85) {AGGREGATOR\_DB};
+\path (15.25, 8.35) pic {db=green};
+\node[font=\footnotesize, align=center, text=green!35!black]
+  at (15.25, 7.35)
   {схемы, таблицы,\\ колонки, ключи,\\ индексы, история};
 
-\draw[biarrow] (10.5, 7.7) -- (12.0, 7.7)
-  node[midway, above, lbl] {INSERT / SELECT};
+\draw[biarrow] (12.0, 6.4) -- (13.5, 6.4)
+  node[midway, above, lbl] {INSERT\\ SELECT};
 
 % ==================== КЛИЕНТ ====================
 \draw[rounded corners=4pt, thick, fill=purple!3, draw=purple!45]
-  (0.5, 0.8) rectangle (10.5, 3.4);
+  (0.5, 0.5) rectangle (17.0, 2.8);
 \node[anchor=north west, font=\bfseries\footnotesize, text=purple!45!black]
-  at (0.7, 3.25) {CLIENT (Svelte)};
-\node[clientbox] at (2.3, 2.0) {Дерево схем};
-\node[clientbox] at (5.5, 2.0) {Сравнение};
-\node[clientbox] at (8.7, 2.0) {Джойны и история};
+  at (0.7, 2.65) {CLIENT (Svelte)};
+\node[clientbox] at (3.0, 1.5) {Дерево схем};
+\node[clientbox] at (8.75, 1.5) {Сравнение и diff};
+\node[clientbox] at (14.5, 1.5) {Джойны и история};
 
-\draw[biarrow] (5.5, 3.4) -- (5.5, 4.8)
+\draw[biarrow] (6.25, 2.8) -- (6.25, 3.8)
   node[midway, right, lbl] {HTTP / JSON};
 
 \end{tikzpicture}

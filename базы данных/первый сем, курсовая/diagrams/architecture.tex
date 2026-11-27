@@ -6,66 +6,84 @@
     \draw[fill=#1!40, draw=#1!80, thick]
       (0,0) ellipse (0.3 and 0.1);
   },
-  vmbox/.style={draw, thick, minimum width=2.6cm, minimum height=1.8cm},
-  vmlbl/.style={font=\footnotesize\bfseries, anchor=north west, inner sep=2pt},
-  dblbl/.style={font=\scriptsize, align=center},
-  box/.style={draw, thick, minimum width=3cm, minimum height=1cm},
-  title/.style={font=\bfseries\footnotesize},
-  arrow/.style={-{Stealth[length=2.5mm, width=1.6mm]}, thick}
+  src/.style={
+    draw, rounded corners=2pt, thick, fill=black!5,
+    minimum width=3.0cm, minimum height=1.0cm, align=center
+  },
+  func/.style={
+    draw, rounded corners=2pt, thick, fill=blue!7, draw=blue!50,
+    minimum width=2.9cm, minimum height=1.3cm, align=center
+  },
+  apibar/.style={
+    draw, rounded corners=2pt, thick, fill=blue!16, draw=blue!60,
+    minimum width=9.3cm, minimum height=0.75cm, align=center
+  },
+  clientbox/.style={
+    draw, rounded corners=2pt, fill=purple!8, draw=purple!50,
+    minimum width=2.9cm, minimum height=0.8cm, align=center
+  },
+  arrow/.style={-{Stealth[length=2.5mm, width=1.6mm]}, thick},
+  biarrow/.style={
+    {Stealth[length=2.5mm, width=1.6mm]}-{Stealth[length=2.5mm, width=1.6mm]},
+    thick
+  },
+  lbl/.style={font=\footnotesize, fill=white, inner sep=1.5pt, align=center}
 ]
 
-% ==================== REPOSITORY ====================
-\node[vmbox] (vm1) at (2, 10) {};
-\node[vmlbl, text=blue!70!black] at (vm1.north west) {VM1};
-\path (2, 10.4) pic {db=blue};
-\node[dblbl, text=blue!70!black] at (2, 9.55)
-  {authorities\_dict\\ PostgreSQL 16};
+% ==================== ИСТОЧНИКИ ====================
+\node[src] (vm1) at (3.0, 10.4) {VM1\\ authorities\_dict};
+\node[src] (vm2) at (6.5, 10.4) {VM2\\ authorities\_ops};
+\node[src] (vm3) at (10.0, 10.4) {VM3\\ authorities\_archive};
+\node[font=\bfseries\footnotesize] at (6.5, 11.2) {ИСТОЧНИКИ};
 
-\node[vmbox] (vm2) at (5.4, 10) {};
-\node[vmlbl, text=orange!70!black] at (vm2.north west) {VM2};
-\path (5.4, 10.4) pic {db=orange};
-\node[dblbl, text=orange!70!black] at (5.4, 9.55)
-  {authorities\_ops\\ PostgreSQL 16};
+\draw[arrow] (vm1.south) -- (3.0, 9.65);
+\draw[arrow] (vm2.south) -- (6.5, 9.65);
+\draw[arrow] (vm3.south) -- (10.0, 9.65);
+\draw[thick] (3.0, 9.65) -- (10.0, 9.65);
+\draw[arrow] (6.5, 9.65) -- (6.5, 9.2)
+  node[midway, right, lbl] {JDBC};
 
-\node[vmbox] (vm3) at (8.8, 10) {};
-\node[vmlbl, text=red!70!black] at (vm3.north west) {VM3};
-\path (8.8, 10.4) pic {db=red};
-\node[dblbl, text=red!70!black] at (8.8, 9.55)
-  {authorities\_archive\\ MariaDB 11};
+% ==================== СЕРВИС ====================
+\draw[rounded corners=4pt, thick, fill=blue!2, draw=blue!45]
+  (0.5, 4.8) rectangle (10.5, 9.2);
+\node[anchor=north west, font=\bfseries\footnotesize]
+  at (0.7, 9.05) {SERVICE (Quarkus)};
 
-\begin{scope}[on background layer]
-  \node[draw, thick, dashed, inner sep=8pt,
-        fit=(vm1) (vm2) (vm3)] (repo) {};
-\end{scope}
-\node[font=\bfseries\footnotesize, anchor=south west, inner sep=4pt]
-  at ([yshift=2pt]repo.north west) {REPOSITORY};
+\node[apibar] (api) at (5.5, 8.4) {REST API};
+\node[func] (collect) at (2.3, 6.6)
+  {Сбор\\ метаданных};
+\node[func] (compare) at (5.5, 6.6)
+  {Сравнение\\ метаданных};
+\node[func] (federation) at (8.7, 6.6)
+  {Федеративные\\ запросы};
 
-% ==================== SERVICE ====================
-\node[box] (service) at (2.2, 5.5) {};
-\node[title] at (service.center) {SERVICE};
+\draw[arrow] (2.3, 8.02) -- (2.3, 7.25);
+\draw[arrow] (5.5, 8.02) -- (5.5, 7.25);
+\draw[arrow] (8.7, 8.02) -- (8.7, 7.25);
 
-% ==================== AGGREGATOR_DB ====================
-% блок шире, текст сверху, иконка снизу по центру
-\node[box, minimum width=5cm, minimum height=1.8cm] (agg) at (9, 5.5) {};
-\node[title, anchor=center] at ([yshift=3pt]agg.center) {AGGREGATOR\_DB};
-\path ([yshift=-5pt]agg.center) pic {db=black};
+% ==================== ХРАНИЛИЩЕ ====================
+\draw[rounded corners=4pt, thick, fill=green!4, draw=green!55]
+  (12.0, 4.8) rectangle (15.5, 9.2);
+\node[anchor=north west, font=\bfseries\footnotesize, text=green!40!black]
+  at (12.2, 9.05) {AGGREGATOR\_DB};
+\path (13.75, 8.55) pic {db=green};
+\node[font=\scriptsize, align=center, text=green!35!black]
+  at (13.75, 7.65)
+  {схемы, таблицы,\\ колонки, ключи,\\ индексы, история};
 
-% ==================== CLIENT ====================
-\node[box] (client) at (2.2, 1.5) {};
-\node[title] at (client.center) {CLIENT};
+\draw[biarrow] (10.5, 7.7) -- (12.0, 7.7)
+  node[midway, above, lbl] {INSERT / SELECT};
 
-% ==================== СВЯЗИ ====================
-\draw[arrow] (repo.south) -- (service.north)
-  node[midway, above, sloped, font=\footnotesize] {SELECT};
+% ==================== КЛИЕНТ ====================
+\draw[rounded corners=4pt, thick, fill=purple!3, draw=purple!45]
+  (0.5, 0.8) rectangle (10.5, 3.4);
+\node[anchor=north west, font=\bfseries\footnotesize, text=purple!45!black]
+  at (0.7, 3.25) {CLIENT (Svelte)};
+\node[clientbox] at (2.3, 2.0) {Дерево схем};
+\node[clientbox] at (5.5, 2.0) {Сравнение};
+\node[clientbox] at (8.7, 2.0) {Джойны и история};
 
-\draw[arrow] ([yshift=2pt]service.east) -- ([yshift=2pt]agg.west)
-  node[midway, above, font=\footnotesize] {INSERT};
-
-\draw[arrow] ([yshift=-2pt]agg.west) -- ([yshift=-2pt]service.east)
-  node[midway, below, font=\footnotesize] {SELECT};
-
-\draw[arrow] (service.south) -- (client.north)
-  node[midway, right, xshift=2pt, font=\footnotesize, align=left]
-  {HTTP:\\schema, diff};
+\draw[biarrow] (5.5, 3.4) -- (5.5, 4.8)
+  node[midway, right, lbl] {HTTP / JSON};
 
 \end{tikzpicture}

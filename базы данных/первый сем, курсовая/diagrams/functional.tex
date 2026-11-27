@@ -1,0 +1,72 @@
+\begin{tikzpicture}[
+  x=1cm, y=1cm, font=\small,
+  func/.style={
+    draw, rounded corners=3pt, thick, fill=blue!6, draw=blue!55,
+    minimum width=5cm, minimum height=1.25cm, align=center
+  },
+  funcalt/.style={
+    draw, rounded corners=3pt, thick, fill=orange!8, draw=orange!60,
+    minimum width=5cm, minimum height=1.25cm, align=center
+  },
+  ext/.style={
+    draw, rounded corners=2pt, thick, fill=black!5,
+    minimum width=3.5cm, minimum height=1.0cm, align=center
+  },
+  arrow/.style={-{Stealth[length=2.5mm, width=1.6mm]}, thick},
+  biarrow/.style={
+    {Stealth[length=2.5mm, width=1.6mm]}-{Stealth[length=2.5mm, width=1.6mm]},
+    thick
+  },
+  lbl/.style={font=\footnotesize, align=center}
+]
+
+% ==================== ГРАНИЦА СИСТЕМЫ ====================
+\draw[rounded corners=4pt, thick, fill=blue!2, draw=blue!45]
+  (0, 0) rectangle (16, 8.5);
+\node[anchor=north west, font=\bfseries\footnotesize]
+  at (0.2, 8.35) {Система управления метаданными};
+
+% ==================== ИСТОЧНИКИ ====================
+\node[ext] (src1) at (4, 10.0) {VM1\\ authorities\_dict};
+\node[ext] (src2) at (8, 10.0) {VM2\\ authorities\_ops};
+\node[ext] (src3) at (12, 10.0) {VM3\\ authorities\_archive};
+\node[font=\bfseries\footnotesize] at (8, 10.9) {Источники метаданных};
+
+% ==================== ФУНКЦИИ СИСТЕМЫ ====================
+\node[func] (collect) at (8, 6.9)
+  {Сбор метаданных\\[2pt]
+   \footnotesize коннекторы PostgreSQL и MariaDB};
+\node[func] (catalog) at (8, 4.9)
+  {Ведение каталога\\[2pt]
+   \footnotesize хранение и выборка \texttt{sc\_*}};
+\node[func] (compare) at (4.5, 2.7)
+  {Сравнение метаданных\\[2pt]
+   \footnotesize эталон и текущая схема};
+\node[funcalt] (federation) at (11.5, 2.7)
+  {Федеративные запросы\\[2pt]
+   \footnotesize JOIN таблиц из источников};
+\node[func, minimum width=13cm] (interface) at (8, 0.9)
+  {Веб-интерфейс и REST API};
+
+% ==================== ПОЛЬЗОВАТЕЛЬ ====================
+\node[ext] (user) at (8, -1.0) {Пользователь};
+
+% ==================== СВЯЗИ ====================
+\draw[arrow] (src1.south) -- (4, 8.15) -- (7.2, 7.55);
+\draw[arrow] (src2.south) -- (8, 7.55);
+\draw[arrow] (src3.south) -- (12, 8.15) -- (8.8, 7.55);
+
+\draw[arrow] (collect) -- (catalog)
+  node[midway, right, lbl] {запись};
+\draw[arrow] (catalog) -- (compare)
+  node[midway, above left, lbl] {эталон};
+\draw[arrow] (catalog) -- (federation)
+  node[midway, above right, lbl] {метаданные};
+\draw[arrow] (compare) -- (interface)
+  node[midway, left, lbl] {diff};
+\draw[arrow] (federation) -- (interface)
+  node[midway, right, lbl] {результат};
+\draw[biarrow] (interface.south) -- (user.north)
+  node[midway, right, lbl] {HTTP};
+
+\end{tikzpicture}

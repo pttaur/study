@@ -43,7 +43,7 @@
 \draw[rounded corners=4pt, thick, fill=blue!2, draw=blue!45]
   (0.5, 3.8) rectangle (12.0, 9.0);
 \node[anchor=north west, font=\bfseries\footnotesize]
-  at (0.7, 8.85) {SERVICE (Quarkus)};
+  at (0.7, 8.85) {SERVICE};
 
 \node[func] (collect) at (3.3, 7.3)
   {Сбор\\ метаданных};
@@ -59,24 +59,26 @@
   (13.5, 3.8) rectangle (17.0, 9.0);
 \node[anchor=north west, font=\bfseries\footnotesize, text=green!40!black]
   at (13.7, 8.85) {AGGREGATOR\_DB};
-\path (15.25, 8.35) pic {db=green};
+\path (15.25, 8.45) pic {db=green};
 \node[font=\footnotesize, align=center, text=green!35!black]
-  at (15.25, 7.35)
+  at (15.25, 6.9)
   {схемы, таблицы,\\ колонки, ключи,\\ индексы, история};
 
-\draw[biarrow] (12.0, 6.4) -- (13.5, 6.4)
-  node[midway, above, lbl] {INSERT\\ SELECT};
+\draw[arrow] (12.0, 6.55) -- (13.5, 6.55)
+  node[midway, above=2pt, lbl] {INSERT};
+\draw[arrow] (13.5, 6.25) -- (12.0, 6.25)
+  node[midway, below=2pt, lbl] {SELECT};
 
 % ==================== КЛИЕНТ ====================
 \draw[rounded corners=4pt, thick, fill=purple!3, draw=purple!45]
   (0.5, 0.5) rectangle (17.0, 2.8);
 \node[anchor=north west, font=\bfseries\footnotesize, text=purple!45!black]
-  at (0.7, 2.65) {CLIENT (Svelte)};
+  at (0.7, 2.65) {CLIENT};
 \node[clientbox] at (3.0, 1.5) {Дерево схем};
 \node[clientbox] at (8.75, 1.5) {Сравнение и diff};
 \node[clientbox] at (14.5, 1.5) {Джойны и история};
 
 \draw[biarrow] (6.25, 2.8) -- (6.25, 3.8)
-  node[midway, right, lbl] {HTTP / JSON};
+  node[midway, right=8pt, lbl] {HTTP / JSON};
 
 \end{tikzpicture}

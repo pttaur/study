@@ -7,9 +7,8 @@
 ## 1. Обзор
 
 Сервис каталогизирует схемы нескольких СУБД-источников (PostgreSQL, MariaDB),
-хранит их снапшоты в собственной PostgreSQL-базе (`sc_*`), умеет сравнивать схемы,
-контролировать дрейф данных (row-level) и выполнять **федеративные SQL-запросы** с
-JOIN таблиц из разных источников.
+хранит их снапшоты в собственной PostgreSQL-базе (`sc_*`), сравнивает только
+метаданные и выполняет **федеративные SQL-запросы** с JOIN таблиц из разных источников.
 
 ```
 ┌──────────────────────────┐        REST / SSE        ┌──────────────────────────┐
@@ -134,7 +133,7 @@ POST /instances/{id}/load
     CacheProvider.put → CatalogEventBus.publish → SSE
 ```
 
-### 3.2. Дрейф схемы
+### 3.2. Сравнение схем
 ```
 POST /instances/{id}/check
   baseline = cache ?? CatalogRepository.loadCatalog
@@ -146,9 +145,7 @@ POST /instances/{id}/check
 ```
 GET  …/rows?limit&offset   → live-выборка (ORDER BY по PK из DatabaseMetaData)
 ```
-Построчный diff на клиенте: кнопка «Обновить и сравнить» берёт строки «на экране» как «было»,
-читает свежие live-строки и строит дифф по PK (`frontend/src/lib/rowDiff.ts`), затем обновляет
-таблицу и подсвечивает изменения.
+Строки используется только для просмотра; сравнение содержимого таблиц не выполняется.
 
 ### 3.4. Федеративный запрос
 ```
@@ -180,12 +177,11 @@ POST /join {tables, select, maxRows, offset, timeoutMs}
 | `lib/join.svelte.ts` | `JoinStore`: таблицы, соединения, выбор колонок, результат, план, история |
 | `lib/api.ts` | Клиент REST/SSE |
 | `lib/types.ts` | Типы домена |
-| `lib/rowDiff.ts` | `diffRows`, `annotateRows`, `primaryKeyColumns` |
 | `lib/format.ts`, `lib/errors.ts` | Утилиты |
 | `components/InstanceDock.svelte` | Вкладки «Инстансы» / «SQL» |
 | `components/SchemaTree.svelte` | Дерево «инстанс → схема → таблица» (ключи, FK, индексы) |
-| `components/DataPanel.svelte` / `RowsExplorer.svelte` / `RowDiffView.svelte` | Данные и построчный дифф |
-| `components/SchemaDiffDrawer.svelte` / `DiffViewer.svelte` | Дрейф схемы |
+| `components/DataPanel.svelte` / `RowsExplorer.svelte` | Просмотр строк таблицы |
+| `components/SchemaDiffDrawer.svelte` / `DiffViewer.svelte` | Сравнение метаданных |
 | `components/JoinBuilder.svelte` / `QueryResultView.svelte` | Конструктор джойнов и Результат / История |
 
 ---

@@ -50,12 +50,12 @@ const diff: DiffResult = {
 describe('DiffViewer', () => {
   it('renders nothing when there is no diff', () => {
     render(DiffViewer, { props: { diff: null, instance } });
-    expect(screen.queryByText(/Дрифт: pg-authorities-dict/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Сравнение схем: pg-authorities-dict/)).not.toBeInTheDocument();
   });
 
   it('shows the instance label and counts', () => {
     render(DiffViewer, { props: { diff, instance } });
-    expect(screen.getByText(/Дрифт: pg-authorities-dict/)).toBeInTheDocument();
+    expect(screen.getByText(/Сравнение схем: pg-authorities-dict/)).toBeInTheDocument();
     expect(screen.getByText('добавлено: 2')).toBeInTheDocument();
     expect(screen.getByText('удалено: 2')).toBeInTheDocument();
     expect(screen.getByText(/изменено: 3/)).toBeInTheDocument();

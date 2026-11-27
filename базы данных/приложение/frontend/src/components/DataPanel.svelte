@@ -1,12 +1,17 @@
 <script lang="ts">
   import type { Table } from '../lib/types';
-  import { primaryKeyColumns } from '../lib/rowDiff';
   import RowsExplorer from './RowsExplorer.svelte';
 
   let { instanceId, schemaName, table }: { instanceId: number; schemaName: string; table: Table } =
     $props();
 
-  let keyColumns = $derived(primaryKeyColumns(table));
+  let keyColumns = $derived(
+    table.constraints
+      .find((constraint) => constraint.type === 'PRIMARY_KEY')
+      ?.columns.slice()
+      .sort((a, b) => a.position - b.position)
+      .map((column) => column.columnName) ?? [],
+  );
 </script>
 
 <div class="data-panel">
@@ -14,11 +19,11 @@
     <span class="muted">Таблица {schemaName}.{table.tableName}</span>
     <span class="muted">{table.columns.length} колонок</span>
     <span class="muted">
-      PK: {keyColumns.length > 0 ? keyColumns.join(', ') : 'нет (сравнение по всей строке)'}
+      PK: {keyColumns.length > 0 ? keyColumns.join(', ') : 'нет'}
     </span>
   </div>
   {#key `${instanceId}.${schemaName}.${table.tableName}`}
-    <RowsExplorer {instanceId} {schemaName} tableName={table.tableName} {keyColumns} />
+    <RowsExplorer {instanceId} {schemaName} tableName={table.tableName} />
   {/key}
 </div>
 

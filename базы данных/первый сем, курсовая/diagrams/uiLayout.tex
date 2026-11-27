@@ -28,7 +28,7 @@
   {Новый инстанс};
 
 \foreach \y/\lbl in {8.45/Название, 8.05/JDBC URL, 7.65/Пользователь,
-                   7.25/Пароль, 6.85/Alias} {
+                   7.25/Пароль} {
   \draw[field] (0.18,\y-0.27) rectangle (2.05,\y);
   \node[anchor=west, black!50] at (0.24,\y-0.135) {\lbl};
 }
@@ -41,12 +41,14 @@
 \node[anchor=north west, font=\bfseries\scriptsize] at (0.18,5.82)
   {Источники};
 
-\foreach \y/\iname/\ialias in {5.30/vault1/@dict, 4.55/vault2/@ops,
-                      3.80/demo-local/@demo} {
+\foreach \y/\iname/\ikind in {5.30/authorities\_dict/PG,
+                      4.55/authorities\_ops/PG,
+                      3.80/authorities\_archive/MariaDB} {
   \draw[field] (0.18,\y-0.34) rectangle (4.12,\y);
   \node[anchor=west] at (0.26,\y-0.17) {\iname};
-  \node[anchor=east, black!50] at (3.05,\y-0.17) {\ialias};
-  \node[chip] at (3.82,\y-0.17) {обн};
+  \node[anchor=east, black!50] at (2.75,\y-0.17) {\ikind};
+  \node[chip] at (3.42,\y-0.17) {обн};
+  \node[chip] at (3.92,\y-0.17) {ср};
 }
 
 % дерево выбранного источника
@@ -101,7 +103,7 @@
   (4.55,0.20) rectangle (15.75,4.15);
 \fill[black!7, rounded corners=2pt] (4.55,3.82) rectangle (15.75,4.15);
 \node[anchor=west, font=\bfseries\tiny] at (4.68,3.985)
-  {Схема-дифф: vault1};
+  {Сравнение схем: vault1};
 \node[anchor=east, font=\tiny, black!55] at (15.62,3.985)
   {\textbf{--} свернуть};
 

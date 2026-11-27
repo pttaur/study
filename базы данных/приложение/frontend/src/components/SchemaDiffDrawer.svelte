@@ -12,7 +12,7 @@
 <div class="diff-drawer" class:collapsed={!open}>
   <button class="drawer-head" onclick={() => (open = !open)}>
     <span class="chev">{open ? '▾' : '▸'}</span>
-    Схема-дифф: {instance.label}
+    Сравнение схем: {instance.label}
   </button>
   {#if open}
     <div class="drawer-body">

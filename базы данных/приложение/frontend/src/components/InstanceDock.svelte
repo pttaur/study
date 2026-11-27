@@ -22,7 +22,7 @@
     onOpenDiff: () => void;
   } = $props();
 
-  async function checkDrift(instanceId: number): Promise<void> {
+  async function compareSchema(instanceId: number): Promise<void> {
     if (await store.check(instanceId)) {
       onOpenDiff();
     }
@@ -41,11 +41,11 @@
             ↻
           </button>
           <button
-            title="Сравнить схему с текущей БД"
-            onclick={() => void checkDrift(instance.id)}
+            title="Сравнить сохранённую схему с текущей"
+            onclick={() => void compareSchema(instance.id)}
             disabled={store.checking.has(instance.id)}
           >
-            {store.checking.has(instance.id) ? '…' : 'Check drift'}
+            {store.checking.has(instance.id) ? '…' : 'Сравнить схему'}
           </button>
         </div>
         <SchemaTree

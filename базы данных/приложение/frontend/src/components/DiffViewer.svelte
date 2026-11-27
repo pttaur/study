@@ -37,7 +37,7 @@
 {#if diff}
   <div class="panel">
     <div class="summary">
-      <span class="lg">Дрифт: {instance.label}</span>
+      <span class="lg">Сравнение схем: {instance.label}</span>
       <span>эталон → текущее</span>
       <span class="badges">
         <span class="b added">добавлено: {count('ADDED')}</span>

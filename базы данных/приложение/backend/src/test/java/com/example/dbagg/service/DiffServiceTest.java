@@ -76,9 +76,9 @@ class DiffServiceTest {
 
     var result = new DiffService(new CacheProvider()).compare(base, compare);
 
-    var rowDiff = result.schemas().get(0).tables().get(0);
-    assertThat(rowDiff.type()).isEqualTo(DiffType.ADDED);
-    assertThat(rowDiff.columns()).isEmpty();
+    var tableDiff = result.schemas().get(0).tables().get(0);
+    assertThat(tableDiff.type()).isEqualTo(DiffType.ADDED);
+    assertThat(tableDiff.columns()).isEmpty();
   }
 
   @Test

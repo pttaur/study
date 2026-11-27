@@ -36,8 +36,8 @@
 
 Клиентская часть построена из компонентов: \field{InstanceDock}
 с формой подключения и деревом схем, \field{SchemaTree},
-\field{RowsExplorer} и \field{RowDiffView} для работы с данными,
-\field{SchemaDiffDrawer} и \field{DiffViewer} для сравнения схем,
+\field{RowsExplorer} для просмотра строк,
+\field{SchemaDiffDrawer} и \field{DiffViewer} для сравнения метаданных,
 \field{JoinBuilder} и \field{QueryResultView} для федеративных
 запросов. Состояние вынесено в runes-модули
 \field{instances.svelte.ts} и \field{join.svelte.ts}; модуль
@@ -53,7 +53,8 @@
 \field{MariaDbConnector}~--- \field{information\_schema} MariaDB.
 Оба коннектора работают через соединение <<только чтение>>, поэтому
 сбор метаданных не блокирует таблицы источника и не требует его
-остановки.
+остановки. Сравнение выполняется исключительно над собранными
+описаниями структуры; сравнение содержимого таблиц не предусмотрено.
 
 Собранный каталог сохраняется в рамках транзакции в два этапа.
 Сначала записываются схемы, таблицы, колонки и индексы. Затем
@@ -88,14 +89,11 @@
   GET & \path{/api/instances/{id}} & Источник по идентификатору \\
   POST & \path{/api/instances} & Создание источника \\
   PATCH & \path{/api/instances/{id}/password} & Смена пароля \\
-  PATCH & \path{/api/instances/{id}/alias} & Смена alias для федерации \\
-  POST & \path{/api/instances/aliases/backfill} & Проставить alias
-    существующим источникам \\
   POST & \path{/api/instances/{id}/load} & Собрать и сохранить схему \\
-  POST & \path{/api/instances/{id}/check} & Сравнить сохранённую схему
-    с текущей \\
+  POST & \path{/api/instances/{id}/check} & Сравнить метаданные
+    сохранённой и текущей схемы \\
   GET & \path{/api/instances/{id}/schema} & Каталог источника \\
-  POST & \path{/api/instances/compare} & Сравнить две схемы \\
+  POST & \path{/api/instances/compare} & Сравнить метаданные двух каталогов \\
   GET & \path{/api/instances/{id}/tables/{schema}/{table}/rows} &
     Страница строк таблицы \\
   POST & \path{/api/join} & Выполнить федеративный запрос \\
@@ -121,5 +119,70 @@
 максимально, время выполнения до 30~с по умолчанию и до 300~с
 максимально, до 500~000 строк из одного источника. Результат
 истории сохраняется в таблице \field{sc\_query\_history}.
+
+\subsection{Пример преобразования федеративного запроса}
+
+Конструктор по выбранным таблицам, колонкам и условиям формирует
+исходный SQL. Например, соединение доверенностей из VM2 с шаблонами
+из VM1 выглядит так:
+
+{\small
+\begin{verbatim}
+SELECT t0."id" AS "t0_id",
+       t0."template_id" AS "template_id",
+       t1."id" AS "t1_id"
+FROM "authorities_ops"."public"."procuration" t0
+INNER JOIN "authorities_dict"."public"."template" t1
+        ON t0."template_id" = t1."id"
+ORDER BY t0."id", t0."template_id", t1."id"
+\end{verbatim}
+}
+
+Сервер читает из каждого источника только нужные колонки,
+создаёт временные таблицы в хранилище и загружает строки батчами
+по 1000 записей:
+
+{\small
+\begin{verbatim}
+SELECT "id", "template_id" FROM "public"."procuration";
+CREATE TEMP TABLE "fed_k1f8_0" (
+  "id" bigint,
+  "template_id" bigint
+) ON COMMIT PRESERVE ROWS;
+INSERT INTO "fed_k1f8_0" ("id", "template_id") VALUES (?, ?);
+
+SELECT "id" FROM "public"."template";
+CREATE TEMP TABLE "fed_k1f8_1" ("id" bigint)
+  ON COMMIT PRESERVE ROWS;
+INSERT INTO "fed_k1f8_1" ("id") VALUES (?);
+\end{verbatim}
+}
+
+После подмены имён исходных таблиц на временные получается
+результирующий запрос, который и выполняется во внутреннем PostgreSQL:
+
+{\small
+\begin{verbatim}
+SELECT t0."id" AS "t0_id",
+       t0."template_id" AS "template_id",
+       t1."id" AS "t1_id"
+FROM "fed_k1f8_0" t0
+INNER JOIN "fed_k1f8_1" t1
+        ON t0."template_id" = t1."id"
+ORDER BY t0."id", t0."template_id", t1."id";
+\end{verbatim}
+}
+
+Собственно JOIN и ограничение размера ответа выполняются на том же
+соединении, где созданы временные таблицы:
+
+{\small
+\begin{verbatim}
+SELECT count(*) FROM (<outerSql>) AS fed_count;
+
+SELECT * FROM (<outerSql>) AS fed_result
+LIMIT 1000 OFFSET 0;
+\end{verbatim}
+}
 
 \end{document}

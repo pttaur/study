@@ -27,17 +27,17 @@
 ]
 
 % ==================== ИСТОЧНИКИ ====================
-\node[src] (vm1) at (3.2, 10.5) {VM1\\ authorities\_dict};
-\node[src] (vm2) at (8.5, 10.5) {VM2\\ authorities\_ops};
-\node[src] (vm3) at (13.8, 10.5) {VM3\\ authorities\_archive};
-\node[font=\bfseries\footnotesize] at (8.5, 11.4) {ИСТОЧНИКИ};
+\node[src] (vm1) at (3.2, 11.2) {VM1\\ authorities\_dict};
+\node[src] (vm2) at (8.5, 11.2) {VM2\\ authorities\_ops};
+\node[src] (vm3) at (13.8, 11.2) {VM3\\ authorities\_archive};
+\node[font=\bfseries\footnotesize] at (8.5, 12.1) {ИСТОЧНИКИ};
 
-\draw[arrow] (vm1.south) -- (3.2, 9.7);
-\draw[arrow] (vm2.south) -- (8.5, 9.7);
-\draw[arrow] (vm3.south) -- (13.8, 9.7);
-\draw[thick] (3.2, 9.7) -- (13.8, 9.7);
-\draw[arrow] (8.5, 9.7) -- (8.5, 9.0);
-\node[lbl] at (6.2, 9.7) {JDBC};
+\draw[arrow] (vm1.south) -- (3.2, 9.8);
+\draw[arrow] (vm2.south) -- (8.5, 9.8);
+\draw[arrow] (vm3.south) -- (13.8, 9.8);
+\draw[thick] (3.2, 9.8) -- (13.8, 9.8);
+\draw[arrow] (8.5, 9.8) -- (8.5, 9.0);
+\node[lbl] at (6.2, 9.8) {JDBC};
 
 % ==================== СЕРВИС ====================
 \draw[rounded corners=4pt, thick, fill=blue!2, draw=blue!45]
@@ -57,9 +57,9 @@
 % ==================== ХРАНИЛИЩЕ ====================
 \draw[rounded corners=4pt, thick, fill=green!4, draw=green!55]
   (13.5, 3.8) rectangle (17.0, 9.0);
-\node[anchor=north west, font=\bfseries\footnotesize, text=green!40!black]
-  at (13.7, 8.85) {AGGREGATOR\_DB};
-\path (15.25, 8.45) pic {db=green};
+\path (13.95, 8.5) pic {db=green};
+\node[anchor=west, font=\bfseries\scriptsize, text=green!40!black]
+  at (14.35, 8.5) {AGGREGATOR\_DB};
 \node[font=\footnotesize, align=center, text=green!35!black]
   at (15.25, 6.9)
   {схемы, таблицы,\\ колонки, ключи,\\ индексы, история};

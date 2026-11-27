@@ -38,11 +38,10 @@
 - `sc_indexes` + `sc_index_columns` — индексы и состав колонок
 - `sc_query_history` — журнал федеративных запросов
 
-Схема описана миграциями `sql/V1..V7`: `V1__create_schema.sql`, `V2__encrypt_password.sql`
-(шифрование), `V3__snapshot_rows.sql`, `V4__federation.sql` (алиасы/kind/история),
-`V5__constraints_and_triggers.sql` (CHECK статуса, триггер `updated_at`),
-`V6__normalize_catalog.sql` (нормализация ограничений/индексов, MariaDB),
-`V7__drop_sc_rows.sql` (удаление устаревшей таблицы снапшотов строк).
+Схема описана миграциями `sql/V1..V8`: `V1__create_schema.sql`, `V2__encrypt_password.sql`
+(шифрование), `V4__federation.sql` (kind/история), `V5__constraints_and_triggers.sql`
+(CHECK статуса, триггер `updated_at`), `V6__normalize_catalog.sql` (нормализация
+ограничений/индексов, MariaDB), `V8__remove_instance_alias.sql` (удаление alias).
 
 ### 2. Backend (Quarkus 3)
 

@@ -1,11 +1,9 @@
 -- ===========================================================================
--- Нормализация ограничений/индексов + типы СУБД (MariaDB) + защита снапшотов
+-- Нормализация ограничений/индексов + типы СУБД (MariaDB)
 -- ---------------------------------------------------------------------------
 -- 1. sc_instances.kind: новый набор (Postgres/MariaDB/...). ORACLE убран.
--- 2. sc_rows: CHECK на размер rows_json (<= 1 MB), предварительно обнуляем
---    слишком большие снапшоты (хэши сохраняются).
--- 3. sc_query_history: индекс по created_at DESC.
--- 4. sc_constraints/sc_indexes пересоздаются в нормализованном виде:
+-- 2. sc_query_history: индекс по created_at DESC.
+-- 3. sc_constraints/sc_indexes пересоздаются в нормализованном виде:
 --    составные ключи и порядок вынесены в sc_constraint_columns/sc_index_columns.
 --    Данные каталога пересобираются через POST /instances/{id}/load.
 -- ===========================================================================
@@ -18,23 +16,13 @@ ALTER TABLE sc_instances ADD CONSTRAINT ck_sc_instances_kind
     CHECK (kind IN ('POSTGRES','MARIADB','MYSQL','SQLITE','MSSQL','OTHER'));
 
 -- ---------------------------------------------------------------------------
--- 2. Размер снапшота строк
--- ---------------------------------------------------------------------------
-UPDATE sc_rows SET rows_json = NULL
-WHERE rows_json IS NOT NULL AND length(rows_json) > 1000000;
-
-ALTER TABLE sc_rows DROP CONSTRAINT IF EXISTS ck_sc_rows_json_size;
-ALTER TABLE sc_rows ADD CONSTRAINT ck_sc_rows_json_size
-    CHECK (rows_json IS NULL OR length(rows_json) <= 1000000);
-
--- ---------------------------------------------------------------------------
--- 3. История запросов
+-- 2. История запросов
 -- ---------------------------------------------------------------------------
 CREATE INDEX IF NOT EXISTS ix_sc_query_history_created_at
     ON sc_query_history (created_at DESC);
 
 -- ---------------------------------------------------------------------------
--- 4. Нормализованные ограничения и индексы
+-- 3. Нормализованные ограничения и индексы
 -- ---------------------------------------------------------------------------
 DROP TABLE IF EXISTS sc_constraint_columns CASCADE;
 DROP TABLE IF EXISTS sc_index_columns CASCADE;

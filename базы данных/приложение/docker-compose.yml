@@ -16,11 +16,9 @@ services:
       - scagg-data:/var/lib/postgresql/data
       - ./sql/V1__create_schema.sql:/docker-entrypoint-initdb.d/01-V1.sql:ro
       - ./sql/V2__encrypt_password.sql:/docker-entrypoint-initdb.d/02-V2.sql:ro
-      - ./sql/V3__snapshot_rows.sql:/docker-entrypoint-initdb.d/03-V3.sql:ro
       - ./sql/V4__federation.sql:/docker-entrypoint-initdb.d/04-V4.sql:ro
       - ./sql/V5__constraints_and_triggers.sql:/docker-entrypoint-initdb.d/05-V5.sql:ro
       - ./sql/V6__normalize_catalog.sql:/docker-entrypoint-initdb.d/06-V6.sql:ro
-      - ./sql/V7__drop_sc_rows.sql:/docker-entrypoint-initdb.d/07-V7.sql:ro
       - ./sql/V8__remove_instance_alias.sql:/docker-entrypoint-initdb.d/08-V8.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-scagg} -d ${POSTGRES_DB:-scagg}"]

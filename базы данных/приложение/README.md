@@ -43,7 +43,7 @@ docker compose up -d --build
 ```
 
 При запуске через `docker compose` frontend доступен на http://localhost:3000,
-backend API — на http://localhost:8080/api. Миграции `sql/V1`…`sql/V6`
+backend API — на http://localhost:8080/api. Миграции из каталога `sql/`
 применяются автоматически при первом старте контейнера БД (пустой том).
 
 Разработка:

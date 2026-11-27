@@ -49,11 +49,9 @@ public class StoragePostgresResource implements QuarkusTestResourceLifecycleMana
           List.of(
               "/V1__create_schema.sql",
               "/V2__encrypt_password.sql",
-              "/V3__snapshot_rows.sql",
               "/V4__federation.sql",
               "/V5__constraints_and_triggers.sql",
               "/V6__normalize_catalog.sql",
-              "/V7__drop_sc_rows.sql",
               "/V8__remove_instance_alias.sql")) {
         var sql = readResource(file);
         for (var statement : splitStatements(sql)) {

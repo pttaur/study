@@ -1,6 +1,6 @@
 # Schema Catalog Aggregator — архитектура приложения и структура БД
 
-Актуально на текущую версию кода (`backend`, `frontend`, `sql/V1..V6`).
+Актуально на текущую версию кода (`backend`, `frontend`, `sql/V1..V8`).
 
 ---
 
@@ -145,7 +145,7 @@ POST /instances/{id}/check
 ```
 GET  …/rows?limit&offset   → live-выборка (ORDER BY по PK из DatabaseMetaData)
 ```
-Строки используется только для просмотра; сравнение содержимого таблиц не выполняется.
+Строки используются только для просмотра; сравнение содержимого таблиц не выполняется.
 
 ### 3.4. Федеративный запрос
 ```
@@ -271,7 +271,6 @@ UNIQUE `(index_id, column_name)` и `(index_id, position)`.
 | `timeoutMs` | default 30 000, max 300 000 |
 | строк из одного источника | 500 000 (`SourceReader.MAX_SOURCE_ROWS`) |
 | страница DataGrid | default 100, max 200 |
-| снапшот строк | default 200, `rows_json` ≤ 1 MB |
 | история запросов | последние 50 |
 
 - Пароли — только через `CryptoUtil` (pgcrypto); ключ `SCHEMA_ENCRYPT_KEY` (без дефолта).

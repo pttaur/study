@@ -17,14 +17,14 @@
     {Stealth[length=2.5mm, width=1.6mm]}-{Stealth[length=2.5mm, width=1.6mm]},
     thick
   },
-  lbl/.style={font=\footnotesize, align=center}
+  lbl/.style={font=\footnotesize, align=center, fill=white, inner sep=1.5pt}
 ]
 
 % ==================== ГРАНИЦА СИСТЕМЫ ====================
 \draw[rounded corners=4pt, thick, fill=blue!2, draw=blue!45]
   (0, 0) rectangle (16, 8.5);
-\node[anchor=north west, font=\bfseries\footnotesize]
-  at (0.2, 8.35) {Система управления метаданными};
+\node[anchor=west, font=\bfseries\footnotesize]
+  at (0.2, -0.3) {Система управления метаданными};
 
 % ==================== ИСТОЧНИКИ ====================
 \node[ext] (src1) at (4, 10.0) {VM1\\ authorities\_dict};
